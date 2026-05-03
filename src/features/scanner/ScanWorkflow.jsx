@@ -28,14 +28,14 @@ export function ScanWorkflow({ queueStats }) {
             <div
               className={`flex items-center gap-3 rounded-2xl border p-3 transition ${
                 isActive
-                  ? "border-accent/30 bg-accent/10 text-ink"
+                  ? "border-accent/40 bg-accent/10 text-brand shadow-sm"
                   : "border-brand/10 bg-white/100 text-brand/50"
               }`}
               key={step.label}
             >
               <span
                 className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${
-                  isActive ? "bg-gradient-to-br from-accent to-brand text-white" : "bg-brand/10"
+                  isActive ? "bg-gradient-to-br from-accent via-brand to-coral text-white" : "bg-brand/10 text-brand/55"
                 }`}
               >
                 <Icon className="h-4 w-4" />

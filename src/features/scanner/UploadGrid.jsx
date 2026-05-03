@@ -1,14 +1,20 @@
 import { ImagePlus, UploadCloud, X } from "lucide-react";
+import { MAX_UPLOAD_CARDS } from "../../utils/scannerUtils.js";
 
-function DropZone({ onFiles }) {
+function DropZone({ disabled, remainingSlots, onFiles }) {
   const handleDrop = (event) => {
     event.preventDefault();
+    if (disabled) return;
     onFiles("front", Array.from(event.dataTransfer.files || []));
   };
 
   return (
     <label
-      className="group flex min-h-[180px] cursor-pointer flex-col items-center justify-center rounded-[18px] border border-dashed border-brand/20 bg-gradient-to-br from-white to-sky-50/60 p-6 text-center transition hover:-translate-y-1 hover:border-accent/100 hover:shadow-soft"
+      className={`group flex min-h-[180px] flex-col items-center justify-center rounded-[18px] border border-dashed border-brand/20 bg-gradient-to-br from-white to-surface p-6 text-center transition ${
+        disabled
+          ? "cursor-not-allowed opacity-60"
+          : "cursor-pointer hover:-translate-y-1 hover:border-accent/100 hover:shadow-soft"
+      }`}
       htmlFor="card-upload"
       onDragOver={(event) => event.preventDefault()}
       onDrop={handleDrop}
@@ -17,7 +23,9 @@ function DropZone({ onFiles }) {
         <ImagePlus className="h-6 w-6" />
       </span>
       <span className="text-sm font-bold text-ink">Upload Card Images</span>
-      <span className="mt-1 max-w-[260px] text-sm leading-6 text-brand/60">Upload business card images to scan.</span>
+      <span className="mt-1 max-w-[260px] text-sm leading-6 text-brand/60">
+        {disabled ? "Maximum 5 card images are already selected." : `Upload up to ${remainingSlots} more card images.`}
+      </span>
       <span className="mt-5 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-semibold text-brand shadow-sm ring-1 ring-brand/10">
         <UploadCloud className="h-4 w-4" />
         Choose files
@@ -25,9 +33,13 @@ function DropZone({ onFiles }) {
       <input
         accept="image/png,image/jpeg"
         className="sr-only"
+        disabled={disabled}
         id="card-upload"
         multiple
-        onChange={(event) => onFiles("front", Array.from(event.target.files || []))}
+        onChange={(event) => {
+          onFiles("front", Array.from(event.target.files || []));
+          event.target.value = "";
+        }}
         type="file"
       />
     </label>
@@ -47,6 +59,8 @@ export function UploadGrid({
   const hasPendingCards = cards.some((card) => card.status === "Pending");
   const hasFailedCards = cards.some((card) => card.status === "Failed");
   const canProcess = hasPendingCards || hasFailedCards;
+  const remainingSlots = Math.max(MAX_UPLOAD_CARDS - cards.length, 0);
+  const uploadLimitReached = remainingSlots === 0;
 
   return (
     <section className="premium-panel min-w-0 overflow-hidden rounded-[18px] p-5">
@@ -78,17 +92,23 @@ export function UploadGrid({
       </div>
 
       {error ? (
-        <div className="mb-5 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 break-words">
+        <div className="mb-5 rounded-2xl border border-coral/20 bg-coral/10 px-4 py-3 text-sm font-semibold text-coral break-words">
           {error}
         </div>
       ) : null}
 
-      <DropZone onFiles={onFiles} />
+      <DropZone
+        disabled={uploadLimitReached || isProcessing}
+        onFiles={onFiles}
+        remainingSlots={remainingSlots}
+      />
 
       <div className="mt-6">
         <div className="mb-3 flex items-center justify-between gap-3">
           <h3 className="text-sm font-bold text-ink">Uploaded files</h3>
-          <span className="text-xs font-semibold text-brand/50">{cards.length} card records</span>
+          <span className="text-xs font-semibold text-brand/50">
+            {cards.length}/{MAX_UPLOAD_CARDS} card records
+          </span>
         </div>
 
         {hasCards ? (
@@ -119,7 +139,7 @@ export function UploadGrid({
                     <p className="text-xs text-brand/50">{card.language} detection · {card.status}</p>
                   </div>
                   <button
-                    className="rounded-full p-2 text-brand/50 transition hover:bg-red-50 hover:text-red-600"
+                    className="rounded-full p-2 text-brand/50 transition hover:bg-coral/10 hover:text-coral"
                     onClick={() => onRemoveCard(card.id)}
                     type="button"
                     aria-label="Remove card"

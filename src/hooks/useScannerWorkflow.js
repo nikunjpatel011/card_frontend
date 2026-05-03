@@ -10,6 +10,7 @@ import {
   buildFrontCards,
   getProgressLabel,
   getQueueStats,
+  MAX_UPLOAD_CARDS,
 } from "../utils/scannerUtils.js";
 
 const DEFAULT_DAILY_LIMIT = 200;
@@ -126,14 +127,28 @@ export function useScannerWorkflow() {
     const imageFiles = files.filter((file) => file.type.startsWith("image/"));
     if (!imageFiles.length) return;
 
-    setWorkflowError("");
-    setCards((current) => {
-      if (type === "front") {
-        return [...current, ...buildFrontCards(imageFiles, current.length)];
+    if (type === "front") {
+      const availableSlots = MAX_UPLOAD_CARDS - cards.length;
+
+      if (availableSlots <= 0) {
+        setWorkflowError(`You can upload only ${MAX_UPLOAD_CARDS} card images at a time.`);
+        return;
       }
 
-      return attachBackImages(current, imageFiles);
-    });
+      const acceptedFiles = imageFiles.slice(0, availableSlots);
+
+      if (imageFiles.length > availableSlots) {
+        setWorkflowError(`Only ${MAX_UPLOAD_CARDS} card images are allowed at a time. Extra images were not added.`);
+      } else {
+        setWorkflowError("");
+      }
+
+      setCards((current) => [...current, ...buildFrontCards(acceptedFiles, current.length)]);
+      return;
+    }
+
+    setWorkflowError("");
+    setCards((current) => attachBackImages(current, imageFiles, MAX_UPLOAD_CARDS));
   };
 
   const removeCard = (cardId) => {

@@ -67,7 +67,7 @@ export function Navbar({ onOpenSidebar, usage, limit }) {
             type="button"
             aria-label="User profile"
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[linear-gradient(135deg,#111815,#9AF36D)] text-xs font-bold text-white">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[linear-gradient(135deg,#0E3438,#23979E_68%,#F27A5E)] text-xs font-bold text-white">
               NS
             </span>
             <ChevronDown className="h-4 w-4 text-brand/60" />

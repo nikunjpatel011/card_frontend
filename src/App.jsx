@@ -1,8 +1,7 @@
 import { useState } from "react";
-import { Navbar } from "./components/layout/Navbar.jsx";
+import { Menu } from "lucide-react";
 import { Sidebar } from "./components/layout/Sidebar.jsx";
 import { AnalyticsPage } from "./features/analytics/AnalyticsPage.jsx";
-import { ContactTable } from "./features/contacts/ContactTable.jsx";
 import { DashboardPage } from "./features/dashboard/DashboardPage.jsx";
 import { ScanCardsPage } from "./features/scanner/ScanCardsPage.jsx";
 import { SettingsPage } from "./features/settings/SettingsPage.jsx";
@@ -27,16 +26,6 @@ export default function App() {
           dailyLimit={scanner.dailyLimit}
           stats={scanner.stats}
           usage={scanner.usage}
-        />
-      );
-    }
-
-    if (activePage === "contacts") {
-      return (
-        <ContactTable
-          contacts={scanner.contacts}
-          onDelete={scanner.deleteContact}
-          onUpdate={scanner.updateContact}
         />
       );
     }
@@ -70,11 +59,18 @@ export default function App() {
       />
       <div className="relative z-10 min-h-screen w-full lg:pl-72">
         <div className="mx-auto min-h-screen w-full max-w-[1440px] px-3 py-4 sm:px-5 lg:px-8">
-          <Navbar
-            limit={scanner.dailyLimit}
-            onOpenSidebar={() => setMobileMenuOpen(true)}
-            usage={scanner.usage}
-          />
+          {/* Mobile Menu Button */}
+          <div className="mb-4 lg:hidden">
+            <button
+              onClick={() => setMobileMenuOpen(true)}
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-brand/10 bg-white text-brand shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              type="button"
+              aria-label="Open navigation"
+            >
+              <Menu className="h-5 w-5" />
+            </button>
+          </div>
+          
           <main className="pt-5">
             {renderPage()}
           </main>

@@ -50,3 +50,8 @@ export async function uploadCardImages(card) {
 
   return parseResponse(response);
 }
+
+export async function getDailyStats() {
+  const response = await fetch(`${API_BASE_URL}/daily-stats`);
+  return parseResponse(response);
+}

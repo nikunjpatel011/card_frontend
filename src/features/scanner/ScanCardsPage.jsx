@@ -1,56 +1,70 @@
-import { Languages, ToggleRight } from "lucide-react";
-import { ScanWorkflow } from "./ScanWorkflow.jsx";
-import { EditableForm } from "./EditableForm.jsx";
+import { useEffect, useRef, useState } from "react";
+import { Check } from "lucide-react";
 import { ProcessingQueue } from "./ProcessingQueue.jsx";
 import { UploadGrid } from "./UploadGrid.jsx";
 
+function CompletionModal({ cardCount, onClose }) {
+  return (
+    <div
+      aria-labelledby="completion-modal-title"
+      aria-modal="true"
+      className="completion-modal-backdrop fixed inset-0 z-50 flex items-center justify-center px-4"
+      role="dialog"
+    >
+      <div className="completion-modal relative w-full max-w-md rounded-[18px] bg-white px-8 py-9 text-center shadow-2xl">
+        <div className="completion-sparkles" aria-hidden="true">
+          {Array.from({ length: 18 }, (_, index) => (
+            <span key={index} />
+          ))}
+        </div>
+
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-accent text-white shadow-soft">
+          <Check className="h-8 w-8 stroke-[3]" />
+        </div>
+
+        <h2 id="completion-modal-title" className="mt-6 text-xl font-extrabold text-ink">
+          Cards Scanned Successfully!
+        </h2>
+        <p className="mx-auto mt-2 max-w-xs text-sm leading-6 text-brand/60">
+          {cardCount === 1 ? "Your card has been processed successfully." : `${cardCount} cards have been processed successfully.`}
+        </p>
+
+        <button
+          className="gradient-button mt-7 inline-flex min-w-28 items-center justify-center rounded-2xl px-6 py-2.5 text-sm font-bold text-white"
+          onClick={onClose}
+          type="button"
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function ScanCardsPage({ scanner }) {
-  const usagePercent = scanner.dailyLimit
-    ? Math.min(100, Math.round((scanner.usage / scanner.dailyLimit) * 100))
-    : 0;
+  const [showCompletionModal, setShowCompletionModal] = useState(false);
+  const wasProcessing = useRef(false);
+
+  useEffect(() => {
+    const finishedProcessing = wasProcessing.current && !scanner.isProcessing;
+    wasProcessing.current = scanner.isProcessing;
+
+    const allCardsCompleted =
+      scanner.cards.length > 0 && scanner.cards.every((card) => card.status === "Completed");
+
+    if (finishedProcessing && allCardsCompleted) {
+      setShowCompletionModal(true);
+    }
+  }, [scanner.cards, scanner.isProcessing]);
 
   return (
     <div className="space-y-6 fade-slide">
-      <ScanWorkflow queueStats={scanner.queueStats} />
-
-      <div className="grid gap-4 lg:grid-cols-[1fr_auto_auto] lg:items-center">
-        <div className="premium-panel rounded-[18px] p-4">
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="inline-flex items-center gap-2 rounded-full bg-brand/10 px-3 py-1.5 text-xs font-bold text-brand">
-              <Languages className="h-4 w-4" />
-              Multi-language support: EN | HI | GU
-            </span>
-            <button
-              className={`inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold transition ${
-                scanner.languageAssist ? "bg-accent/20 text-brand" : "bg-brand/10 text-brand/50"
-              }`}
-              onClick={() => scanner.setLanguageAssist((current) => !current)}
-              type="button"
-            >
-              <ToggleRight className="h-4 w-4" />
-              Auto detect {scanner.languageAssist ? "on" : "off"}
-            </button>
-          </div>
-        </div>
-
-        <div className="premium-panel rounded-[18px] px-4 py-3">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-brand/50">Free Plan</p>
-          <p className="mt-1 text-sm font-bold text-brand">{scanner.dailyLimit} scans/day</p>
-        </div>
-
-        <div className="premium-panel rounded-[18px] px-4 py-3">
-          <div className="mb-2 flex justify-between gap-6 text-xs font-semibold text-brand/60">
-            <span>{scanner.usage} / {scanner.dailyLimit} scans used</span>
-            <span>{usagePercent}%</span>
-          </div>
-          <div className="h-1.5 w-44 overflow-hidden rounded-full bg-brand/10">
-            <div
-              className="h-full rounded-full bg-gradient-to-r from-accent to-brand"
-              style={{ width: `${usagePercent}%` }}
-            />
-          </div>
-        </div>
-      </div>
+      {showCompletionModal ? (
+        <CompletionModal
+          cardCount={scanner.cards.length}
+          onClose={() => setShowCompletionModal(false)}
+        />
+      ) : null}
 
       <UploadGrid
         cards={scanner.cards}
@@ -62,15 +76,12 @@ export function ScanCardsPage({ scanner }) {
         onStartProcessing={scanner.processCards}
       />
 
-      <div className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
+      <div className="min-w-0">
         <ProcessingQueue
           cards={scanner.cards}
           onSelectCard={scanner.setSelectedCardId}
           progressLabel={scanner.progressLabel}
           selectedCardId={scanner.selectedCardId}
-        />
-        <EditableForm
-          card={scanner.selectedCard}
         />
       </div>
     </div>

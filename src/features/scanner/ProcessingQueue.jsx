@@ -1,10 +1,10 @@
 import { AlertCircle, CheckCircle2, Clock3, Loader2, ScanText } from "lucide-react";
 
 const statusStyles = {
-  Pending: "bg-amber-50 text-amber-700 ring-amber-100",
-  Processing: "bg-sky-50 text-sky-700 ring-sky-100",
-  Completed: "bg-sky-50 text-sky-700 ring-sky-100",
-  Failed: "bg-red-50 text-red-700 ring-red-100",
+  Pending: "bg-coral/10 text-coral ring-coral/20",
+  Processing: "bg-accent/10 text-brand ring-accent/20",
+  Completed: "bg-brand/10 text-brand ring-brand/15",
+  Failed: "bg-coral/15 text-coral ring-coral/25",
 };
 
 const statusIcons = {
@@ -50,7 +50,7 @@ export function ProcessingQueue({ cards, selectedCardId, onSelectCard, progressL
               <button
                 className={`flex w-full min-w-0 items-center gap-3 rounded-[18px] border p-3 text-left transition hover:-translate-y-0.5 hover:shadow-soft ${
                   selected
-                    ? "border-accent/50 bg-sky-50/100"
+                    ? "border-accent/50 bg-accent/10"
                     : "border-brand/10 bg-white/75 hover:border-accent/25"
                 }`}
                 key={card.id}
@@ -94,7 +94,7 @@ export function ProcessingQueue({ cards, selectedCardId, onSelectCard, progressL
                   <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-brand/10">
                     <div
                       className={`h-full rounded-full transition-all duration-500 ${
-                        card.status === "Failed" ? "bg-red-500" : "bg-gradient-to-r from-accent to-brand"
+                        card.status === "Failed" ? "bg-coral" : "bg-gradient-to-r from-accent to-brand"
                       }`}
                       style={{
                         width:

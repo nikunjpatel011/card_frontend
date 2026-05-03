@@ -1,17 +1,14 @@
 import {
   BarChart3,
-  ContactRound,
   LayoutDashboard,
   ScanLine,
   Settings,
   X,
-  Zap,
 } from "lucide-react";
 
 const menuItems = [
   { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
   { id: "scan", label: "Scan Cards", icon: ScanLine },
-  { id: "contacts", label: "Contacts", icon: ContactRound },
   { id: "analytics", label: "Analytics", icon: BarChart3 },
   { id: "settings", label: "Settings", icon: Settings },
 ];
@@ -34,16 +31,16 @@ export function Sidebar({ activePage, onNavigate, mobileOpen, onClose, usage, li
       >
         <div className="flex h-16 items-center justify-between">
           <button
-            className="flex min-w-0 items-center gap-3 rounded-2xl px-1 text-left transition hover:opacity-90"
+            className="flex min-w-0 flex-1 items-center justify-center rounded-2xl px-1 text-left transition hover:opacity-90"
             onClick={() => onNavigate("dashboard")}
             type="button"
+            aria-label="Go to dashboard"
           >
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-accent text-brand shadow-sm">
-              <Zap className="h-5 w-5 fill-brand/10" />
-            </span>
-            <span className="truncate text-xl font-extrabold tracking-normal text-brand">
-              CardCRM
-            </span>
+            <img
+              alt="Nimkro"
+              className="h-16 w-auto max-w-[230px] object-contain"
+              src="/nimkro.webp"
+            />
           </button>
           <button
             className="rounded-full border border-brand/10 bg-white p-2 text-brand shadow-sm transition hover:bg-brand hover:text-white lg:hidden"
@@ -66,8 +63,8 @@ export function Sidebar({ activePage, onNavigate, mobileOpen, onClose, usage, li
                   key={item.id}
                   className={`group flex w-full items-center gap-3 rounded-2xl px-4 py-3 text-sm font-bold transition ${
                     active
-                      ? "bg-brand text-white shadow-sm"
-                      : "text-brand/65 hover:bg-brand/[0.05] hover:text-brand"
+                      ? "bg-gradient-to-r from-accent to-brand text-white shadow-sm shadow-brand/10"
+                      : "text-brand/65 hover:bg-accent/10 hover:text-brand"
                   }`}
                   onClick={() => onNavigate(item.id)}
                   type="button"

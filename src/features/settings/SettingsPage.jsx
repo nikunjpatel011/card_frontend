@@ -1,43 +1,11 @@
-import { CheckCircle2, ShieldCheck, ToggleRight } from "lucide-react";
+import { CheckCircle2, ShieldCheck } from "lucide-react";
 
 export function SettingsPage({ limit, usage }) {
   const remaining = Math.max(0, limit - usage);
   const usagePercent = limit ? Math.min(100, Math.round((usage / limit) * 100)) : 0;
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[1fr_0.85fr] fade-slide">
-      <section className="premium-panel rounded-[18px] p-5">
-        <div className="mb-6">
-          <h2 className="text-lg font-bold text-ink">Scanner Preferences</h2>
-          <p className="mt-1 text-sm text-brand/60">Visual controls for operational settings.</p>
-        </div>
-
-        <div className="space-y-4">
-          {[
-            ["Auto language detection", "English, Hindi, and Gujarati profiles are active."],
-            ["Auto-save to Google Sheet", "Each card is appended as soon as OCR processing completes."],
-            ["Duplicate contact checks", "Email and phone matches are flagged in the contacts view."],
-          ].map(([title, description]) => (
-            <div
-              className="flex items-center justify-between gap-4 rounded-[18px] border border-brand/10 bg-white/75 p-4"
-              key={title}
-            >
-              <div>
-                <p className="font-bold text-ink">{title}</p>
-                <p className="mt-1 text-sm text-brand/50">{description}</p>
-              </div>
-              <button
-                className="rounded-full bg-accent/20 p-2 text-brand transition hover:scale-105"
-                type="button"
-                aria-label={title}
-              >
-                <ToggleRight className="h-6 w-6" />
-              </button>
-            </div>
-          ))}
-        </div>
-      </section>
-
+    <div className="grid gap-6 xl:grid-cols-1 fade-slide">
       <aside className="space-y-6">
         <section className="premium-panel rounded-[18px] p-5">
           <div className="mb-5 flex items-center gap-3">

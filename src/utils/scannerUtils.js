@@ -1,4 +1,5 @@
 export const languageCycle = ["EN", "HI", "GU"];
+export const MAX_UPLOAD_CARDS = 5;
 
 export const createPreview = (file) => ({
   file,
@@ -24,7 +25,7 @@ export const buildFrontCards = (files, existingCount) =>
     createdAt: Date.now() + index,
   }));
 
-export const attachBackImages = (currentCards, files) => {
+export const attachBackImages = (currentCards, files, maxCards = MAX_UPLOAD_CARDS) => {
   const nextCards = [...currentCards];
   let fileIndex = 0;
 
@@ -38,7 +39,7 @@ export const attachBackImages = (currentCards, files) => {
     }
   }
 
-  while (fileIndex < files.length) {
+  while (fileIndex < files.length && nextCards.length < maxCards) {
     nextCards.push({
       id: crypto.randomUUID(),
       front: null,
