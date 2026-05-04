@@ -3,6 +3,7 @@ import {
   getBackendStatus,
   getJobStatus,
   getResults,
+  getResultsStats,
   uploadCardImages,
 } from "../services/scannerApi.js";
 import {
@@ -66,7 +67,7 @@ function revokeCardUrls(card) {
   if (card.back?.url) URL.revokeObjectURL(card.back.url);
 }
 
-export function useScannerWorkflow() {
+export function useScannerWorkflow(enabled = true) {
   const [contacts, setContacts] = useState([]);
   const [cards, setCards] = useState([]);
   const [usage, setUsage] = useState(0);
@@ -75,6 +76,7 @@ export function useScannerWorkflow() {
   const [selectedCardId, setSelectedCardId] = useState(null);
   const [languageAssist, setLanguageAssist] = useState(true);
   const [workflowError, setWorkflowError] = useState("");
+  const [dbStats, setDbStats] = useState(null);
   const pollingStopped = useRef(false);
 
   const selectedCard = cards.find((card) => card.id === selectedCardId) || null;
@@ -92,10 +94,15 @@ export function useScannerWorkflow() {
   );
 
   const refreshBackendState = useCallback(async () => {
+    if (!enabled) {
+      return;
+    }
+
     try {
-      const [statusResponse, resultsResponse] = await Promise.all([
+      const [statusResponse, resultsResponse, statsResponse] = await Promise.all([
         getBackendStatus(),
         getResults(),
+        getResultsStats(),
       ]);
 
       const normalizedUsage = normalizeUsage(statusResponse.usage);
@@ -108,20 +115,28 @@ export function useScannerWorkflow() {
         .reverse();
 
       setContacts(savedContacts);
+      setDbStats(statsResponse.stats);
       setWorkflowError("");
     } catch (error) {
       setWorkflowError(error.message || "Backend is not reachable.");
     }
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
     pollingStopped.current = false;
+
+    if (!enabled) {
+      return () => {
+        pollingStopped.current = true;
+      };
+    }
+
     refreshBackendState();
 
     return () => {
       pollingStopped.current = true;
     };
-  }, [refreshBackendState]);
+  }, [enabled, refreshBackendState]);
 
   const addFiles = (type, files) => {
     const imageFiles = files.filter((file) => file.type.startsWith("image/"));
@@ -213,7 +228,7 @@ export function useScannerWorkflow() {
   };
 
   const processCards = async () => {
-    if (isProcessing) return;
+    if (!enabled || isProcessing) return;
 
     const processableCards = cards.filter((card) => ["Pending", "Failed"].includes(card.status));
     if (!processableCards.length) return;
@@ -288,6 +303,7 @@ export function useScannerWorkflow() {
     stats,
     usage,
     workflowError,
+    dbStats,
     addFiles,
     clearCards,
     deleteContact,

@@ -39,7 +39,7 @@ function useCountUp(end, duration = 2000) {
   return count;
 }
 
-export function DashboardPage({ contacts, cards, dailyLimit, stats, usage }) {
+export function DashboardPage({ contacts, cards, dailyLimit, stats, usage, dbStats }) {
   const [chartProgress, setChartProgress] = useState(0);
   const [dailyStatistics, setDailyStatistics] = useState({
     pending: 0,
@@ -85,11 +85,17 @@ export function DashboardPage({ contacts, cards, dailyLimit, stats, usage }) {
   const usagePercent = dailyLimit ? Math.min(100, Math.round((usage / dailyLimit) * 100)) : 0;
   const savedThisWeek = contacts.slice(0, 4);
   
-  // Use browser session data for real-time queue statistics
-  const statusData = ["Pending", "Processing", "Completed", "Failed"].map((status) => ({
+  // Use database stats for Queue Statistics chart (day-wise data from MongoDB)
+  const statusData = dbStats ? [
+    { label: "Pending", value: dbStats.byStatus.pending },
+    { label: "Processing", value: dbStats.byStatus.processing },
+    { label: "Completed", value: dbStats.byStatus.completed },
+    { label: "Failed", value: dbStats.byStatus.failed }
+  ] : ["Pending", "Processing", "Completed", "Failed"].map((status) => ({
     label: status,
     value: cards.filter((card) => card.status === status).length,
   }));
+  
   const maxStatusCount = Math.max(...statusData.map((item) => item.value), 1);
 
   return (
@@ -277,7 +283,7 @@ export function DashboardPage({ contacts, cards, dailyLimit, stats, usage }) {
           <div className="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <h2 className="text-base font-extrabold text-brand">Queue Statistics</h2>
-              <p className="mt-1 text-xs font-semibold text-brand/50">Live status from current session</p>
+              <p className="mt-1 text-xs font-semibold text-brand/50">All-time status from database</p>
             </div>
           </div>
 
@@ -306,7 +312,7 @@ export function DashboardPage({ contacts, cards, dailyLimit, stats, usage }) {
             </span>
             <div>
               <h2 className="text-base font-extrabold text-brand">Queue Health</h2>
-              <p className="text-xs font-semibold text-brand/50">Cards move through pending, processing, completed.</p>
+              <p className="text-xs font-semibold text-brand/50">Current session cards in queue.</p>
             </div>
           </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
