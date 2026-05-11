@@ -86,7 +86,7 @@ export function UploadGrid({
             onClick={onStartProcessing}
             type="button"
           >
-            {isProcessing ? "Processing..." : hasFailedCards && !hasPendingCards ? "Retry Failed" : "Upload & Process"}
+            {isProcessing ? "Processing..." : hasFailedCards && !hasPendingCards ? "Retry Failed" : "Start Processing"}
           </button>
         </div>
       </div>

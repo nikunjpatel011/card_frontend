@@ -15,7 +15,7 @@ import {
 } from "../utils/scannerUtils.js";
 
 const DEFAULT_DAILY_LIMIT = 200;
-const POLL_INTERVAL_MS = 1500;
+const POLL_INTERVAL_MS = 1000;
 
 const statusMap = {
   pending: "Pending",
@@ -207,7 +207,6 @@ export function useScannerWorkflow(enabled = true) {
 
     if (nextStatus === "Completed") {
       setSelectedCardId((current) => current || cardId);
-      refreshBackendState();
     }
   };
 
